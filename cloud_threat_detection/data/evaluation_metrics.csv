@@ -1,0 +1,3 @@
+model,accuracy,precision,recall,f1_score,TN,FP,FN,TP
+Isolation Forest,0.9492,0.873,0.873,0.873,7746,254,254,1746
+Random Forest,1.0,1.0,1.0,1.0,8000,0,0,2000

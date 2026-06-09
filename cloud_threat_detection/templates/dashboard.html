@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Cloud Threat Detection and Automated Response System</title>
+
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        
+        :root {
+            --bg:            #f1f5f9;
+            --surface:       #ffffff;
+            --surface-alt:   #f8fafc;
+            --border:        #e2e8f0;
+            --border-strong: #cbd5e1;
+
+            --text:          #0f172a;
+            --text-muted:    #475569;
+            --text-soft:     #64748b;
+
+            --primary:       #2563eb;
+            --primary-dark:  #1e40af;
+            --header-bg:     #0f172a;
+            --header-bg-2:   #1e293b;
+
+            --normal:        #10b981;
+            --low:           #3b82f6;
+            --medium:        #f59e0b;
+            --high:          #ef4444;
+            --critical:      #b91c1c;
+
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow:    0 4px 14px rgba(15, 23, 42, 0.06);
+            --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
+
+            --radius-sm: 8px;
+            --radius:    12px;
+            --radius-lg: 16px;
+        }
+
+        /* ------------------------------------------------------------------
+           Reset & base
+           ------------------------------------------------------------------ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14.5px;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', system-ui, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+
+       
+        .topbar {
+            background: linear-gradient(135deg, var(--header-bg) 0%, var(--header-bg-2) 100%);
+            color: #f8fafc;
+            padding: 22px 36px;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .topbar .inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-mark {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+        }
+        .brand-text h1 {
+            color: #f8fafc;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .brand-text .sub {
+            color: #94a3b8;
+            font-size: 12.5px;
+            margin-top: 1px;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0   rgba(16, 185, 129, 0.6); }
+            70%  { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0   rgba(16, 185, 129, 0); }
+        }
+
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 36px 60px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            margin: 28px 0 14px;
+            padding-left: 4px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+        }
+        @media (max-width: 1100px) {
+            .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        .kpi {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: var(--primary);
+        }
+        .kpi.kpi-normal::before    { background: var(--normal); }
+        .kpi.kpi-suspicious::before{ background: var(--medium); }
+        .kpi.kpi-alerts::before    { background: var(--high); }
+        .kpi.kpi-critical::before  { background: var(--critical); }
+
+        .kpi .label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+        }
+        .kpi .value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 8px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .kpi .meta {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        
+        .threat-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        @media (max-width: 900px) { .threat-row { grid-template-columns: repeat(2, 1fr); } }
+
+        .threat-tile {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .threat-tile .left {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .threat-tile .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+        }
+        .threat-tile .name {
+            font-weight: 600;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+        .threat-tile .count {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .dot.low      { background: var(--low); }
+        .dot.medium   { background: var(--medium); }
+        .dot.high     { background: var(--high); }
+        .dot.critical { background: var(--critical); }
+
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        @media (max-width: 900px) {
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+        }
+        .chart-card h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .chart-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-sm);
+        }
+
+        
+        .two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 1100px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .panel header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-alt);
+        }
+        .panel header h2 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .panel header .count-pill {
+            background: var(--text);
+            color: white;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        table th {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-soft);
+            background: var(--surface-alt);
+            padding: 10px 14px;
+            font-size: 11.5px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: var(--surface-alt); }
+
+        td.id-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); }
+        td.user-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); }
+
+        /* Threat-level badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .badge.low      { background: #dbeafe; color: #1e3a8a; }
+        .badge.medium   { background: #fef3c7; color: #92400e; }
+        .badge.high     { background: #fee2e2; color: #991b1b; }
+        .badge.critical { background: #7f1d1d; color: #fee2e2; }
+
+        /* Attack-type pills (matches the colour palette of attack_type_distribution.png) */
+        .attack-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .attack-pill.normal               { background: #d1fae5; color: #047857; border-color: #a7f3d0; }
+        .attack-pill.brute_force          { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .attack-pill.data_exfiltration    { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+        .attack-pill.privilege_escalation { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .attack-pill.geographic_anomaly   { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+
+        .action-cell {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        
+        .metrics-table td:not(:first-child),
+        .metrics-table th:not(:first-child) {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .metrics-table td:first-child {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        
+        footer {
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 12.5px;
+            padding: 24px 0 0;
+        }
+        footer .bullet { margin: 0 6px; opacity: 0.45; }
+
+        /* Empty-state */
+        .empty {
+            padding: 32px 20px;
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 13.5px;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <header class="topbar">
+        <div class="inner">
+            <div class="brand">
+                <div class="brand-mark">CT</div>
+                <div class="brand-text">
+                    <h1>AI-Powered Cloud Threat Detection and Automated Response System</h1>
+                    <div class="sub">Demonstration &middot; Isolation Forest (main) + Random Forest (baseline)</div>
+                </div>
+            </div>
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                System Active &middot; Live Monitoring
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        
+        <div class="section-title">Overview</div>
+        <div class="kpi-row">
+            <div class="kpi">
+                <div class="label">Total Events</div>
+                <div class="value">{{ "{:,}".format(total_events) }}</div>
+                <div class="meta">Processed cloud activity logs</div>
+            </div>
+            <div class="kpi kpi-normal">
+                <div class="label">Normal Events</div>
+                <div class="value">{{ "{:,}".format(normal_events) }}</div>
+                <div class="meta">
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(normal_events / total_events * 100) }}% of all traffic
+                    {% else %}—{% endif %}
+                </div>
+            </div>
+            <div class="kpi kpi-suspicious">
+                <div class="label">Suspicious Events</div>
+                <div class="value">{{ "{:,}".format(suspicious_events) }}</div>
+                <div class="meta">
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(suspicious_events / total_events * 100) }}% flagged by AI
+                    {% else %}—{% endif %}
+                </div>
+            </div>
+            <div class="kpi kpi-alerts">
+                <div class="label">Total Alerts</div>
+                <div class="value">{{ "{:,}".format(total_alerts) }}</div>
+                <div class="meta">Generated by response engine</div>
+            </div>
+            <div class="kpi kpi-critical">
+                <div class="label">Critical Alerts</div>
+                <div class="value">{{ "{:,}".format(critical_alerts) }}</div>
+                <div class="meta">Require immediate action</div>
+            </div>
+        </div>
+
+        
+        <div class="section-title">Alerts by Threat Level</div>
+        <div class="threat-row">
+            <div class="threat-tile">
+                <div class="left"><span class="dot low"></span><span class="name">Low</span></div>
+                <div class="count">{{ "{:,}".format(low_alerts) }}</div>
+            </div>
+            <div class="threat-tile">
+                <div class="left"><span class="dot medium"></span><span class="name">Medium</span></div>
+                <div class="count">{{ "{:,}".format(medium_alerts) }}</div>
+            </div>
+            <div class="threat-tile">
+                <div class="left"><span class="dot high"></span><span class="name">High</span></div>
+                <div class="count">{{ "{:,}".format(high_alerts) }}</div>
+            </div>
+            <div class="threat-tile">
+                <div class="left"><span class="dot critical"></span><span class="name">Critical</span></div>
+                <div class="count">{{ "{:,}".format(critical_alerts) }}</div>
+            </div>
+        </div>
+
+       
+        <div class="section-title">Analytics</div>
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>Threat Level Distribution</h3>
+                <img src="{{ url_for('static', filename='charts/threat_level_distribution.png') }}"
+                     alt="Threat level distribution chart">
+            </div>
+            <div class="chart-card">
+                <h3>Attack Type Distribution</h3>
+                <img src="{{ url_for('static', filename='charts/attack_type_distribution.png') }}"
+                     alt="Attack type distribution chart">
+            </div>
+            <div class="chart-card">
+                <h3>Confusion Matrix - Isolation Forest</h3>
+                <img src="{{ url_for('static', filename='charts/confusion_matrix.png') }}"
+                     alt="Confusion matrix chart">
+            </div>
+            <div class="chart-card">
+                <h3>Model Performance Metrics</h3>
+                <img src="{{ url_for('static', filename='charts/model_metrics.png') }}"
+                     alt="Model performance metrics chart">
+            </div>
+        </div>
+
+        
+        <div class="section-title">Active Investigation</div>
+        <div class="two-col">
+
+            <!-- Latest alerts -->
+            <div class="panel">
+                <header>
+                    <h2>Latest Alerts</h2>
+                    <span class="count-pill">{{ latest_alerts|length }} shown</span>
+                </header>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Alert ID</th>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Country</th>
+                                <th>Resource</th>
+                                <th>Attack Type</th>
+                                <th>Failed Logins</th>
+                                <th>Downloaded (MB)</th>
+                                <th>Threat</th>
+                                <th>Recommended Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in latest_alerts %}
+                            <tr>
+                                <td class="id-cell">{{ a.alert_id }}</td>
+                                <td>{{ a.timestamp }}</td>
+                                <td class="user-cell">{{ a.user_id }}</td>
+                                <td>{{ a.country }}</td>
+                                <td><code>{{ a.resource_accessed }}</code></td>
+                                <td><span class="attack-pill {{ a.attack_type }}">{{ a.attack_type|replace('_', ' ')|title }}</span></td>
+                                <td>{{ a.failed_logins }}</td>
+                                <td>{{ "%.2f"|format(a.data_download_mb) }}</td>
+                                <td><span class="badge {{ a.threat_level|lower }}">{{ a.threat_level }}</span></td>
+                                <td class="action-cell">{{ a.recommended_action }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="10" class="empty">No alerts available. Please run the pipeline first.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top users -->
+            <div class="panel">
+                <header>
+                    <h2>Top Suspicious Users</h2>
+                    <span class="count-pill">Top 10</span>
+                </header>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Alerts</th>
+                                <th>Critical</th>
+                                <th>Max Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in top_users %}
+                            <tr>
+                                <td class="user-cell">{{ u.user_id }}</td>
+                                <td>{{ u.alert_count }}</td>
+                                <td>{{ u.critical_count }}</td>
+                                <td>{{ u.max_risk_score }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="empty">No data.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="section-title">Model Evaluation Metrics</div>
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1 Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in metrics_rows %}
+                        <tr>
+                            <td>{{ m.model }}</td>
+                            <td>{{ m.accuracy }}</td>
+                            <td>{{ m.precision }}</td>
+                            <td>{{ m.recall }}</td>
+                            <td>{{ m.f1_score }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="empty">No metrics yet. Please run evaluate_model.py.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+       
+        <footer>
+            AI-Powered Cloud Threat Detection &amp; Automated Response System
+            <span class="bullet">&middot;</span>
+            Demonstration
+            <span class="bullet">&middot;</span>
+            Built with Python, scikit-learn &amp; Flask
+        </footer>
+    </div>
+
+</body>
+</html>
